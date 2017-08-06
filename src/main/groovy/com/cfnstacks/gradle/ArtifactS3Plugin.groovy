@@ -57,37 +57,40 @@ class ArtifactS3Plugin implements Plugin<Project> {
 
         project.afterEvaluate {
 
-            if(! project.extensions.artifacts3.repo?.trim()) {
-                throw new GradleException('Error: Required property missing. Set artifacts3.repo property in build.repo')
-            }
+            def repo = (project.artifacts3.repo) ? project.artifacts3.repo :
+                    (System.properties['artifacts3.repo']) ? System.properties['artifacts3.repo'] : null
 
-            if(! project.extensions.artifacts3.group?.trim()) {
-                throw new GradleException('Error: Required property missing. Set artifacts3.group property in build.repo')
-            }
+            if(!repo) { throw new GradleException('Error: Required property artifacts3.repo missing') }
+
+            def group = (project.artifacts3.group) ? project.artifacts3.group :
+                    (System.properties['artifacts3.group']) ? System.properties['artifacts3.group'] : null
+
+            if(!group) { throw new GradleException('Error: Required property artifacts3.group is missing') }
+
+            def profileName = (project.artifacts3.profileName) ? project.artifacts3.profileName :
+                    (System.properties['artifacts3.profileName']) ? System.properties['artifacts3.profileName'] : null
 
             project.publishing {
                 publications {
                     CloudFormationArtifact(MavenPublication) {
                         artifact buildTask
-                        setGroupId project.extensions.artifacts3.group
-
+                        setGroupId group
                     }
                 }
                 repositories {
                     maven {
-                        url "s3://${project.extensions.artifacts3.repo}/${project.version.endsWith('-SNAPSHOT') ? 'snapshot' : 'release'}/"
+                        url "s3://${repo}/${project.version.endsWith('-SNAPSHOT') ? 'snapshot' : 'release'}/"
                         credentials(AwsCredentials) {
-                            if(System.getenv('AWS_ACCESS_KEY_ID') != null &&
-                                    System.getenv('AWS_SECRET_ACCESS_KEY')) {
+                            if(System.getenv('AWS_ACCESS_KEY_ID') != null &&  System.getenv('AWS_SECRET_ACCESS_KEY')) {
                                 accessKey System.getenv('AWS_ACCESS_KEY_ID')
                                 secretKey System.getenv('AWS_SECRET_ACCESS_KEY')
                             } else {
-                                if (project.extensions.artifacts3.profileName?.trim()) {
-                                    def creds = new ProfileCredentialsProvider(project.extensions.artifacts3.profileName).getCredentials();
+                                if (profileName) {
+                                    def creds = new ProfileCredentialsProvider(profileName).getCredentials();
                                     accessKey creds.getAWSAccessKeyId()
                                     secretKey creds.getAWSSecretKey()
                                 } else {
-                                    throw new GradleException('Error: No AWS credential environment variables or profile name found')
+                                    throw new GradleException('Error: No AWS credential environment variables or artifacts3.profileName found')
                                 }
                             }
                         }

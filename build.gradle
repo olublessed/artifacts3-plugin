@@ -1,0 +1,41 @@
+buildscript {
+    repositories { mavenCentral() }
+}
+
+plugins {
+    id 'groovy'
+    id 'maven'
+    id 'maven-publish'
+    id 'net.researchgate.release' version '2.6.0'
+}
+
+group = 'com.cfnstacks.gradle'
+description = 'ArtifactS3 Gradle plugin'
+
+// Library Versions
+ext {
+    amazonSdkVersion = '1.11.172'
+    gradleWrapperVersion = '4.0.2'
+    junitVersion = '4.12'
+    spockVersion = '1.1-groovy-2.4'
+}
+
+dependencies {
+    compile gradleApi()
+    compile "com.amazonaws:aws-java-sdk:$amazonSdkVersion"
+    testCompile gradleTestKit()
+    testCompile "junit:junit:$junitVersion"
+}
+
+release {
+    tagTemplate = 'v${version}'
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = gradleWrapperVersion
+}

@@ -1,5 +1,6 @@
 buildscript {
-    repositories { mavenCentral() }
+    repositories { maven { url "https://plugins.gradle.org/m2/" } }
+    dependencies { classpath 'com.gradle.publish:plugin-publish-plugin:0.9.7' }
 }
 
 plugins {
@@ -17,7 +18,6 @@ ext {
     amazonSdkVersion = '1.11.172'
     gradleWrapperVersion = '4.0.2'
     junitVersion = '4.12'
-    spockVersion = '1.1-groovy-2.4'
 }
 
 dependencies {
@@ -27,12 +27,26 @@ dependencies {
     testCompile "junit:junit:$junitVersion"
 }
 
+pluginBundle {
+    website = 'https://cfn-stacks.com'
+    vcsUrl = 'https://github.com/cfn-stacks/artifacts3-plugin'
+    description = 'Plugin to publish to an ArtifactS3 repo'
+    tags = ['artifacts', 'maven-publish', 's3']
+
+    plugins {
+        artifacts3Plugin {
+            id = 'com.cfnstacks.gradle.artifacts3-plugin'
+            displayName = 'ArtifactS3 Repo Publishing'
+        }
+    }
+}
+
 release {
     tagTemplate = 'v${version}'
 }
 
 repositories {
-    mavenCentral()
+    jcenter()
     mavenLocal()
 }
 

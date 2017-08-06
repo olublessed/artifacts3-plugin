@@ -8,6 +8,7 @@ plugins {
     id 'maven'
     id 'maven-publish'
     id 'net.researchgate.release' version '2.6.0'
+    id 'com.gradle.plugin-publish' version '0.9.7'
 }
 
 group = 'com.cfnstacks.gradle'

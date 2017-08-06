@@ -36,7 +36,7 @@ pluginBundle {
 
     plugins {
         artifacts3Plugin {
-            id = 'com.cfnstacks.gradle.artifacts3-plugin'
+            id = 'com.cfnstacks.gradle.artifacts3'
             displayName = 'ArtifactS3 Repo Publishing'
         }
     }

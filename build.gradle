@@ -72,9 +72,8 @@ pluginBundle {
     }
 }
 
-release {
-    tagTemplate = 'v${version}'
-}
+release { tagTemplate = 'v${version}' }
+afterReleaseBuild.dependsOn publishPlugins
 
 repositories {
     jcenter()

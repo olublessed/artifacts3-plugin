@@ -57,18 +57,25 @@ class ArtifactS3Plugin implements Plugin<Project> {
 
         project.afterEvaluate {
 
-            def repo = (project.artifacts3.repo) ? project.artifacts3.repo :
-                    (System.properties['artifacts3.repo']) ? System.properties['artifacts3.repo'] : null
-
+            def repo = getProp([
+                    System.properties['artifacts3.repo'],
+                    project.artifacts3.repo,
+                    System.getenv('ARTIFACTS3_REPO')
+            ])
             if(!repo) { throw new GradleException('Error: Required property artifacts3.repo missing') }
 
-            def group = (project.artifacts3.group) ? project.artifacts3.group :
-                    (System.properties['artifacts3.group']) ? System.properties['artifacts3.group'] : null
+            def group = getProp([
+                    System.properties['artifacts3.group'],
+                    project.artifacts3.group,
+                    System.getenv('ARTIFACTS3_GROUP')
+            ])
 
             if(!group) { throw new GradleException('Error: Required property artifacts3.group is missing') }
 
-            def profileName = (project.artifacts3.profileName) ? project.artifacts3.profileName :
-                    (System.properties['artifacts3.profileName']) ? System.properties['artifacts3.profileName'] : null
+            def profileName = getProp([
+                    System.properties['artifacts3.profileName'],
+                    project.artifacts3.profileName,
+                    System.getenv('ARTIFACTS3_PROFILENAME')])
 
             project.publishing {
                 publications {
@@ -98,5 +105,11 @@ class ArtifactS3Plugin implements Plugin<Project> {
                 }
             }
         }
+    }
+
+    String getProp(valueArray) {
+        def r = ''
+        values.each({ if(it) { r = it }})
+        return r
     }
 }

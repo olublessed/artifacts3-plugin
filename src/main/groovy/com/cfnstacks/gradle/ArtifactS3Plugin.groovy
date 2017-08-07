@@ -109,7 +109,7 @@ class ArtifactS3Plugin implements Plugin<Project> {
 
     String getProp(valueArray) {
         def r = ''
-        values.each({ if(it) { r = it }})
+        valueArray.each({ if(it) { r = it }})
         return r
     }
 }

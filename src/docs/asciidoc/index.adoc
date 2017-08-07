@@ -1,0 +1,36 @@
+= ArtifactS3 Plugin
+v{projectVersion}
+ifdef::backend-pdf[]
+:title-logo-image: image:logo.png[500, 500, align="center"]
+endif::backend-pdf[]
+
+ifdef::backend-html5[]
+image::logo.png[Logo, 150, 150, float="left"]
+endif::backend-html5[]
+
+== Overview
+
+A Gradle plugin to automate publishing to an ArtifactS3 repository.
+
+== Building
+
+=== Prerequisite
+
+* http://www.oracle.com/technetwork/pt/java/javase/downloads/index.html[Java 8 JDK^]: Download from Oracle or
+    use a packaged version for your OS
+
+=== Documentation Links
+////
+PDF Generation gives an error if you try to use icons
+////
+ifdef::backend-html5[]
+=== icon:file-pdf-o[] pass:[<a href="./index.pdf" target="_blank">PDF Version</a>]
+=== icon:file-code-o[] https://github.com/cfn-stacks/artifacts3-plugin[Source^]
+endif::backend-html5[]
+ifdef::backend-pdf[]
+=== https://github.com/cfn-stacks/artifacts3-plugin[Source^]
+endif::backend-pdf[]
+
+=== Version
+
+This documentation was generated for version {projectVersion} from commit https://github.com/cfn-stacks/artifacts3-plugin/commit/{gitHash}[{gitHashShort}^].

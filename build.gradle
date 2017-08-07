@@ -1,18 +1,48 @@
 buildscript {
     repositories { maven { url "https://plugins.gradle.org/m2/" } }
-    dependencies { classpath 'com.gradle.publish:plugin-publish-plugin:0.9.7' }
+    dependencies {
+        classpath 'com.gradle.publish:plugin-publish-plugin:0.9.7'
+        classpath 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.15'
+    }
 }
 
 plugins {
     id 'groovy'
+    id 'java'
     id 'maven'
     id 'maven-publish'
-    id 'net.researchgate.release' version '2.6.0'
     id 'com.gradle.plugin-publish' version '0.9.7'
+    id 'net.researchgate.release' version '2.6.0'
+    id 'org.asciidoctor.convert' version '1.5.3'
+    id 'org.ajoberstar.grgit' version '2.0.0'
 }
 
 group = 'com.cfnstacks.gradle'
 description = 'ArtifactS3 Gradle plugin'
+
+asciidoctor {
+    backends 'html5', 'pdf'
+    attributes \
+        'build-gradle': file('build.gradle'),
+        'sourcedir': project.sourceSets.main.java.srcDirs[0],
+        'stylesheet': 'stylesheets/style.css',
+        'endpoint-url': 'https://cfn-stacks.com',
+        'source-highlighter': 'coderay',
+        'imagesdir': 'images',
+        'toc': 'left',
+        'icons': 'font',
+        'setanchors': '',
+        'idprefix': '',
+        'idseparator': '-',
+        'docinfo1': '',
+        'projectVersion': project.version,
+        'gitHash': grgit.head().id,
+        'gitHashShort': grgit.head().abbreviatedId
+}
+
+asciidoctorj {
+    version = '1.5.5'
+}
 
 // Library Versions
 ext {
@@ -50,6 +80,8 @@ repositories {
     jcenter()
     mavenLocal()
 }
+
+task docs(dependsOn: [asciidoctor]) {}
 
 task wrapper(type: Wrapper) {
     gradleVersion = gradleWrapperVersion

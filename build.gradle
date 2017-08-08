@@ -47,7 +47,7 @@ asciidoctorj {
 // Library Versions
 ext {
     amazonSdkVersion = '1.11.172'
-    gradleWrapperVersion = '4.0.2'
+    gradleWrapperVersion = '4.1'
     junitVersion = '4.12'
 }
 

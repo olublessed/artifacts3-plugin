@@ -22,10 +22,6 @@ class ArtifactS3Plugin implements Plugin<Project> {
     static final String TASK_CLEAN_NAME = 'clean'
     static final String TASK_COPY_NAME = 'copyAndFilter'
 
-    String repo
-    String group
-    String profileName
-
     @Override
     void apply(Project project) {
 
@@ -46,37 +42,38 @@ class ArtifactS3Plugin implements Plugin<Project> {
 
         // Externally facing tasks
 
-        Task buildTask = project.task(TASK_BUILD_NAME, type: Jar) {
+        Task buildTask = project.task(TASK_BUILD_NAME, type: Jar, dependsOn: copyAndFilter, overwrite: true) {
             group = GROUP_NAME
             description = "Build CloudFormation template artifacts"
             from 'build/cloudformation'
             archiveName = "build/${project.name}-${project.version}.cfn.jar"
         }
-        buildTask.dependsOn(copyAndFilter)
 
-        project.task(TASK_CLEAN_NAME, type: Delete) {
+        project.task(TASK_CLEAN_NAME, type: Delete, overwrite: true) {
             group = GROUP_NAME
             description = 'Deletes the build directory'
             delete 'build'
         }
 
+        def config = project.extensions.artifacts3
+
         project.publishing {
             publications {
                 CloudFormationArtifact(MavenPublication) {
                     artifact buildTask
-                    setGroupId group
+                    setGroupId config.groupSetting
                 }
             }
             repositories {
                 maven {
-                    url "s3://${repo}/${project.version.endsWith('-SNAPSHOT') ? 'snapshot' : 'release'}/"
+                    url "s3://${config.repoSetting}/${project.version.endsWith('-SNAPSHOT') ? 'snapshot' : 'release'}/"
                     credentials(AwsCredentials) {
                         if(System.getenv('AWS_ACCESS_KEY_ID') != null &&  System.getenv('AWS_SECRET_ACCESS_KEY')) {
                             accessKey System.getenv('AWS_ACCESS_KEY_ID')
                             secretKey System.getenv('AWS_SECRET_ACCESS_KEY')
                         } else {
-                            if (profileName) {
-                                def creds = new ProfileCredentialsProvider(profileName).getCredentials();
+                            if (config.profileNameSetting) {
+                                def creds = new ProfileCredentialsProvider(config.profileNameSetting).getCredentials();
                                 accessKey creds.getAWSAccessKeyId()
                                 secretKey creds.getAWSSecretKey()
                             } else {
@@ -88,30 +85,6 @@ class ArtifactS3Plugin implements Plugin<Project> {
             }
         }
 
-        project.afterEvaluate {
-            repo = getProp([
-                    System.properties['artifacts3.repo'],
-                    project.artifacts3.repo,
-                    System.getenv('ARTIFACTS3_REPO')
-            ])
-
-            group = getProp([
-                    System.properties['artifacts3.group'],
-                    project.artifacts3.group,
-                    System.getenv('ARTIFACTS3_GROUP')
-            ])
-
-            profileName = getProp([
-                    System.properties['artifacts3.profileName'],
-                    project.artifacts3.profileName,
-                    System.getenv('ARTIFACTS3_PROFILENAME')])
-        }
-    }
-
-
-    static String getProp(valueArray) {
-        def r = ''
-        valueArray.each({ if(it) { r = it }})
-        return r
+        project.afterEvaluate { project.extensions.getByType(ArtifactS3PluginExtension).settings(project) }
     }
 }

@@ -22,8 +22,13 @@ class ArtifactS3Plugin implements Plugin<Project> {
     static final String TASK_CLEAN_NAME = 'clean'
     static final String TASK_COPY_NAME = 'copyAndFilter'
 
+    String repo
+    String group
+    String profileName
+
     @Override
     void apply(Project project) {
+
         project.plugins.apply(MavenPublishPlugin)
         project.extensions.create(PLUGIN_NAME, ArtifactS3PluginExtension)
 
@@ -55,59 +60,56 @@ class ArtifactS3Plugin implements Plugin<Project> {
             delete 'build'
         }
 
-        project.afterEvaluate {
-
-            def repo = getProp([
-                    System.properties['artifacts3.repo'],
-                    project.artifacts3.repo,
-                    System.getenv('ARTIFACTS3_REPO')
-            ])
-            if(!repo) { throw new GradleException('Error: Required property artifacts3.repo missing') }
-
-            def group = getProp([
-                    System.properties['artifacts3.group'],
-                    project.artifacts3.group,
-                    System.getenv('ARTIFACTS3_GROUP')
-            ])
-
-            if(!group) { throw new GradleException('Error: Required property artifacts3.group is missing') }
-
-            def profileName = getProp([
-                    System.properties['artifacts3.profileName'],
-                    project.artifacts3.profileName,
-                    System.getenv('ARTIFACTS3_PROFILENAME')])
-
-            project.publishing {
-                publications {
-                    CloudFormationArtifact(MavenPublication) {
-                        artifact buildTask
-                        setGroupId group
-                    }
+        project.publishing {
+            publications {
+                CloudFormationArtifact(MavenPublication) {
+                    artifact buildTask
+                    setGroupId group
                 }
-                repositories {
-                    maven {
-                        url "s3://${repo}/${project.version.endsWith('-SNAPSHOT') ? 'snapshot' : 'release'}/"
-                        credentials(AwsCredentials) {
-                            if(System.getenv('AWS_ACCESS_KEY_ID') != null &&  System.getenv('AWS_SECRET_ACCESS_KEY')) {
-                                accessKey System.getenv('AWS_ACCESS_KEY_ID')
-                                secretKey System.getenv('AWS_SECRET_ACCESS_KEY')
+            }
+            repositories {
+                maven {
+                    url "s3://${repo}/${project.version.endsWith('-SNAPSHOT') ? 'snapshot' : 'release'}/"
+                    credentials(AwsCredentials) {
+                        if(System.getenv('AWS_ACCESS_KEY_ID') != null &&  System.getenv('AWS_SECRET_ACCESS_KEY')) {
+                            accessKey System.getenv('AWS_ACCESS_KEY_ID')
+                            secretKey System.getenv('AWS_SECRET_ACCESS_KEY')
+                        } else {
+                            if (profileName) {
+                                def creds = new ProfileCredentialsProvider(profileName).getCredentials();
+                                accessKey creds.getAWSAccessKeyId()
+                                secretKey creds.getAWSSecretKey()
                             } else {
-                                if (profileName) {
-                                    def creds = new ProfileCredentialsProvider(profileName).getCredentials();
-                                    accessKey creds.getAWSAccessKeyId()
-                                    secretKey creds.getAWSSecretKey()
-                                } else {
-                                    throw new GradleException('Error: No AWS credential environment variables or artifacts3.profileName found')
-                                }
+                                throw new GradleException('Error: No AWS credential environment variables or artifacts3.profileName found')
                             }
                         }
                     }
                 }
             }
         }
+
+        project.afterEvaluate {
+            repo = getProp([
+                    System.properties['artifacts3.repo'],
+                    project.artifacts3.repo,
+                    System.getenv('ARTIFACTS3_REPO')
+            ])
+
+            group = getProp([
+                    System.properties['artifacts3.group'],
+                    project.artifacts3.group,
+                    System.getenv('ARTIFACTS3_GROUP')
+            ])
+
+            profileName = getProp([
+                    System.properties['artifacts3.profileName'],
+                    project.artifacts3.profileName,
+                    System.getenv('ARTIFACTS3_PROFILENAME')])
+        }
     }
 
-    String getProp(valueArray) {
+
+    static String getProp(valueArray) {
         def r = ''
         valueArray.each({ if(it) { r = it }})
         return r

@@ -23,6 +23,15 @@ class ArtifactS3Plugin implements Plugin<Project> {
     static final String TASK_CLEAN_NAME = 'clean'
     static final String TASK_COPY_NAME = 'copyAndFilter'
 
+    static final String TASK_CREATE_STACK = 'createStack'
+    static final String TASK_UPDATE_STACK = 'updateStack'
+    static final String TASK_DELETE_STACK = 'deleteStack'
+    static final String TASK_CREATE_STACK_AND_WAIT = 'createStackAndWait'
+    static final String TASK_UPDATE_STACK_AND_WAIT = 'updateStackAndWait'
+    static final String TASK_DELETE_STACK_AND_WAIT = 'deleteStackAndWait'
+    static final String TASK_CREATE_CHANGE_SET = 'createChangeSet'
+    static final String TASK_EXECUTE_CHANGE_SET = 'executeChangeSet'
+
     @Override
     void apply(Project project) {
 
@@ -62,42 +71,47 @@ class ArtifactS3Plugin implements Plugin<Project> {
 
         // Alias all the CloudFormation tasks we want to enable
 
-        project.task('createStack', dependsOn: [buildTask, 'awsCfnMigrateStack']) {
+        Task createStackTask = project.task(TASK_CREATE_STACK, dependsOn: [buildTask, 'awsCfnMigrateStack']) {
             group = GROUP_NAME
             description = 'Creates the stack and returns immediately'
         }
+        createStackTask.mustRunAfter(buildTask)
 
-        project.task('updateStack', dependsOn: [buildTask, 'awsCfnMigrateStack']) {
+        Task updateStackTask = project.task(TASK_UPDATE_STACK, dependsOn: [buildTask, 'awsCfnMigrateStack']) {
             group = GROUP_NAME
             description = 'Updates the stack and returns immediately'
         }
+        updateStackTask.mustRunAfter(buildTask)
 
-        project.task('deleteStack', dependsOn: ['awsCfnDeleteStack']) {
+        project.task(TASK_DELETE_STACK, dependsOn: ['awsCfnDeleteStack']) {
             group = GROUP_NAME
             description = 'Deletes the stack and returns immediately'
         }
 
-        project.task('createStackAndWait', dependsOn: [buildTask, 'awsCfnMigrateStackAndWaitCompleted']) {
+        Task createStackAndWaitTask = project.task(TASK_CREATE_STACK_AND_WAIT, dependsOn: [buildTask, 'awsCfnMigrateStackAndWaitCompleted']) {
             group = GROUP_NAME
             description = 'Creates the stack and returns when completed'
         }
+        createStackAndWaitTask.mustRunAfter(buildTask)
 
-        project.task('updateStackAndWait', dependsOn: [buildTask, 'awsCfnMigrateStackAndWaitCompleted']) {
+        Task updateStackAndWait = project.task(TASK_UPDATE_STACK_AND_WAIT, dependsOn: [buildTask, 'awsCfnMigrateStackAndWaitCompleted']) {
             group = GROUP_NAME
             description = 'Updates the stack and returns when completed'
         }
+        updateStackAndWait.mustRunAfter(buildTask)
 
-        project.task('deleteStackAndWait', dependsOn: [buildTask, 'awsCfnDeleteStackAndWaitCompleted']) {
+        project.task(TASK_DELETE_STACK_AND_WAIT, dependsOn: ['awsCfnDeleteStackAndWaitCompleted']) {
             group = GROUP_NAME
             description = 'Deletes the stack and returns when completed'
         }
 
-        project.task('createChangeSet', dependsOn: [buildTask, 'awsCfnCreateChangeSet']) {
+        Task createChangeSetTask = project.task(TASK_CREATE_CHANGE_SET, dependsOn: [buildTask, 'awsCfnCreateChangeSet']) {
             group = GROUP_NAME
             description = 'Creates a change set'
         }
+        createChangeSetTask.mustRunAfter(buildTask)
 
-        project.task('executeChangeSet', dependsOn: ['awsCfnExecuteChangeSet']) {
+        project.task(TASK_EXECUTE_CHANGE_SET, dependsOn: ['awsCfnExecuteChangeSet']) {
             group = GROUP_NAME
             description = 'Executes and then removes a change set'
         }

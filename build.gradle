@@ -20,6 +20,13 @@ plugins {
 group = 'com.cfnstacks.gradle'
 description = 'ArtifactS3 Gradle plugin'
 
+// Library Versions
+ext {
+    amazonSdkVersion = '1.11.172'
+    junitVersion = '4.12'
+    asciidoctorjVersion = '1.5.5'
+}
+
 asciidoctor {
     backends 'html5', 'pdf'
     attributes \
@@ -41,13 +48,7 @@ asciidoctor {
 }
 
 asciidoctorj {
-    version = '1.5.5'
-}
-
-// Library Versions
-ext {
-    amazonSdkVersion = '1.11.172'
-    junitVersion = '4.12'
+    version = asciidoctorjVersion
 }
 
 dependencies {
@@ -76,7 +77,6 @@ afterReleaseBuild.dependsOn publishPlugins
 
 repositories {
     jcenter()
-    mavenLocal()
 }
 
 task docs(dependsOn: [asciidoctor]) {}

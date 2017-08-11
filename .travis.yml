@@ -1,0 +1,8 @@
+language: java
+script:
+  - ./gradlew docs
+after_success:
+  - ./publish-docs.sh
+branches:
+  only:
+  - master

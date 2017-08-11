@@ -80,3 +80,4 @@ repositories {
 }
 
 task docs(dependsOn: [asciidoctor]) {}
+task projectVersion() { doLast { println project.version } }

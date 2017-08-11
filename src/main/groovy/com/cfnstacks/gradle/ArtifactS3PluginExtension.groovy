@@ -4,17 +4,22 @@ import org.gradle.api.Project
 
 class ArtifactS3PluginExtension {
 
-    String group = ""
+    String group
 
-    String profileName = ""
+    String profileName
 
-    String repo = ""
+    String repo
 
-    String groupSetting = ""
+    String stackName
 
-    String profileNameSetting = ""
+    String groupSetting
 
-    String repoSetting = ""
+    String profileNameSetting
+
+    String repoSetting
+
+    String stackNameSetting
+
 
     // Look in a variety of locations to determine a setting
     // ---
@@ -39,6 +44,12 @@ class ArtifactS3PluginExtension {
                 System.properties['artifacts3.repo'],
                 project.artifacts3.repo,
                 System.getenv('ARTIFACTS3_REPO')
+        ])
+
+        stackNameSetting = getProp([
+                System.properties['artifacts3.stackName'],
+                project.artifacts3.stackName,
+                System.getenv('ARTIFACTS3_STACKNAME')
         ])
     }
 

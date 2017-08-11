@@ -3,6 +3,8 @@ buildscript {
     dependencies {
         classpath 'com.gradle.publish:plugin-publish-plugin:0.9.7'
         classpath 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.15'
+        classpath 'net.researchgate:gradle-release:2.6.0'
+        classpath 'jp.classmethod.aws:gradle-aws-plugin:0.35'
     }
 }
 
@@ -12,6 +14,7 @@ plugins {
     id 'maven'
     id 'maven-publish'
     id 'com.gradle.plugin-publish' version '0.9.7'
+    id 'jp.classmethod.aws.cloudformation' version '0.35'
     id 'net.researchgate.release' version '2.6.0'
     id 'org.asciidoctor.convert' version '1.5.3'
     id 'org.ajoberstar.grgit' version '2.0.0'
@@ -54,6 +57,8 @@ asciidoctorj {
 dependencies {
     compile gradleApi()
     compile "com.amazonaws:aws-java-sdk:$amazonSdkVersion"
+    compile 'jp.classmethod.aws:gradle-aws-plugin:0.35'
+    compile 'net.researchgate:gradle-release:2.6.0'
     testCompile gradleTestKit()
     testCompile "junit:junit:$junitVersion"
 }
@@ -73,7 +78,7 @@ pluginBundle {
 }
 
 release { tagTemplate = 'v${version}' }
-afterReleaseBuild.dependsOn publish
+afterReleaseBuild.dependsOn publishPlugins
 publish.dependsOn build
 
 repositories {

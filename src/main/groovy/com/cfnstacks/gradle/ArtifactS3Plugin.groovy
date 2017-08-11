@@ -1,8 +1,9 @@
 package com.cfnstacks.gradle
 
 import com.amazonaws.auth.profile.ProfileCredentialsProvider
+import jp.classmethod.aws.gradle.cloudformation.AmazonCloudFormationPlugin
+import net.researchgate.release.ReleasePlugin
 import org.apache.tools.ant.filters.ReplaceTokens
-import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -26,6 +27,8 @@ class ArtifactS3Plugin implements Plugin<Project> {
     void apply(Project project) {
 
         project.plugins.apply(MavenPublishPlugin)
+        project.plugins.apply(AmazonCloudFormationPlugin)
+        project.plugins.apply(ReleasePlugin)
         project.extensions.create(PLUGIN_NAME, ArtifactS3PluginExtension)
 
         // Internal tasks
@@ -57,6 +60,50 @@ class ArtifactS3Plugin implements Plugin<Project> {
 
         def config = project.extensions.artifacts3
 
+        // Alias all the CloudFormation tasks we want to enable
+
+        project.task('createStack', dependsOn: [buildTask, 'awsCfnMigrateStack']) {
+            group = GROUP_NAME
+            description = 'Creates the stack and returns immediately'
+        }
+
+        project.task('updateStack', dependsOn: [buildTask, 'awsCfnMigrateStack']) {
+            group = GROUP_NAME
+            description = 'Updates the stack and returns immediately'
+        }
+
+        project.task('deleteStack', dependsOn: ['awsCfnDeleteStack']) {
+            group = GROUP_NAME
+            description = 'Deletes the stack and returns immediately'
+        }
+
+        project.task('createStackAndWait', dependsOn: [buildTask, 'awsCfnMigrateStackAndWaitCompleted']) {
+            group = GROUP_NAME
+            description = 'Creates the stack and returns when completed'
+        }
+
+        project.task('updateStackAndWait', dependsOn: [buildTask, 'awsCfnMigrateStackAndWaitCompleted']) {
+            group = GROUP_NAME
+            description = 'Updates the stack and returns when completed'
+        }
+
+        project.task('deleteStackAndWait', dependsOn: [buildTask, 'awsCfnDeleteStackAndWaitCompleted']) {
+            group = GROUP_NAME
+            description = 'Deletes the stack and returns when completed'
+        }
+
+        project.task('createChangeSet', dependsOn: [buildTask, 'awsCfnCreateChangeSet']) {
+            group = GROUP_NAME
+            description = 'Creates a change set'
+        }
+
+        project.task('executeChangeSet', dependsOn: ['awsCfnExecuteChangeSet']) {
+            group = GROUP_NAME
+            description = 'Executes and then removes a change set'
+        }
+
+        // Configuration
+
         project.publishing {
             publications {
                 CloudFormationArtifact(MavenPublication) {
@@ -76,14 +123,17 @@ class ArtifactS3Plugin implements Plugin<Project> {
                                 def creds = new ProfileCredentialsProvider(config.profileNameSetting).getCredentials();
                                 accessKey creds.getAWSAccessKeyId()
                                 secretKey creds.getAWSSecretKey()
-                            } else {
-                                throw new GradleException('Error: No AWS credential environment variables or artifacts3.profileName found')
                             }
                         }
                     }
                 }
             }
         }
+        project.release { tagTemplate = 'v${version}' }
+
+        Task publishTask = project.tasks.getByName('publish')
+        project.tasks.getByName('afterReleaseBuild').dependsOn(publishTask)
+        publishTask.dependsOn(buildTask)
 
         project.afterEvaluate { project.extensions.getByType(ArtifactS3PluginExtension).settings(project) }
     }

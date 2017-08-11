@@ -47,7 +47,6 @@ asciidoctorj {
 // Library Versions
 ext {
     amazonSdkVersion = '1.11.172'
-    gradleWrapperVersion = '4.1'
     junitVersion = '4.12'
 }
 
@@ -81,7 +80,3 @@ repositories {
 }
 
 task docs(dependsOn: [asciidoctor]) {}
-
-task wrapper(type: Wrapper) {
-    gradleVersion = gradleWrapperVersion
-}

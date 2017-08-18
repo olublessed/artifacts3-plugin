@@ -8,6 +8,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.credentials.AwsCredentials
+import org.gradle.api.plugins.BasePlugin
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.publish.maven.plugins.MavenPublishPlugin
 import org.gradle.api.tasks.Delete
@@ -38,6 +39,7 @@ class ArtifactS3Plugin implements Plugin<Project> {
         project.plugins.apply(MavenPublishPlugin)
         project.plugins.apply(AmazonCloudFormationPlugin)
         project.plugins.apply(ReleasePlugin)
+        project.plugins.apply(BasePlugin)
         project.extensions.create(PLUGIN_NAME, ArtifactS3PluginExtension)
 
         // Internal tasks

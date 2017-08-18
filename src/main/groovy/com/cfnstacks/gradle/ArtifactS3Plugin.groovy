@@ -19,8 +19,8 @@ class ArtifactS3Plugin implements Plugin<Project> {
     static final String GROUP_NAME = 'ArtifactS3'
     static final String PLUGIN_NAME = 'artifacts3'
 
-    static final String TASK_BUILD_NAME = 'build'
-    static final String TASK_CLEAN_NAME = 'clean'
+    static final String TASK_BUILD_NAME = 'pluginBuild'
+    static final String TASK_CLEAN_NAME = 'pluginClean'
     static final String TASK_COPY_NAME = 'copyAndFilter'
 
     static final String TASK_CREATE_STACK = 'createStack'
@@ -52,20 +52,21 @@ class ArtifactS3Plugin implements Plugin<Project> {
             ])
         }
 
-        // Externally facing tasks
+        project.tasks.build.dependsOn(copyAndFilter)
 
-        Task buildTask = project.task(TASK_BUILD_NAME, type: Jar, dependsOn: copyAndFilter, overwrite: true) {
-            group = GROUP_NAME
+        Task buildTask = project.task(TASK_BUILD_NAME, type: Jar) {
             description = "Build CloudFormation template artifacts"
             from 'build/cloudformation'
             archiveName = "build/${project.name}-${project.version}.cfn.jar"
         }
+        buildTask.mustRunAfter(copyAndFilter)
 
-        project.task(TASK_CLEAN_NAME, type: Delete, overwrite: true) {
-            group = GROUP_NAME
+        project.task(TASK_CLEAN_NAME, type: Delete, dependsOn: [project.tasks.clean]) {
             description = 'Deletes the build directory'
             delete 'build'
         }
+
+        // Externally facing tasks
 
         def config = project.extensions.artifacts3
 

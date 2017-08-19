@@ -24,6 +24,7 @@ class ArtifactS3Plugin implements Plugin<Project> {
     static final String TASK_CLEAN_NAME = 'pluginClean'
     static final String TASK_COPY_NAME = 'copyAndFilter'
 
+    static final String TASK_PROJECT_VERSION = 'projectVersion'
     static final String TASK_CREATE_STACK = 'createStack'
     static final String TASK_UPDATE_STACK = 'updateStack'
     static final String TASK_DELETE_STACK = 'deleteStack'
@@ -55,13 +56,14 @@ class ArtifactS3Plugin implements Plugin<Project> {
         }
 
         project.tasks.build.dependsOn(copyAndFilter)
+        project.tasks.build.mustRunAfter(copyAndFilter)
 
         Task buildTask = project.task(TASK_BUILD_NAME, type: Jar) {
             description = "Build CloudFormation template artifacts"
             from 'build/cloudformation'
             archiveName = "build/${project.name}-${project.version}.cfn.jar"
         }
-        buildTask.mustRunAfter(copyAndFilter)
+        buildTask.mustRunAfter(project.tasks.build)
 
         project.task(TASK_CLEAN_NAME, type: Delete, dependsOn: [project.tasks.clean]) {
             description = 'Deletes the build directory'
@@ -71,6 +73,14 @@ class ArtifactS3Plugin implements Plugin<Project> {
         // Externally facing tasks
 
         def config = project.extensions.artifacts3
+
+        //task projectVersion() { doLast { println project.version } }
+
+        project.task(TASK_PROJECT_VERSION) {
+            group = GROUP_NAME
+            description = 'Prints the version of the project'
+            doLast { println project.version }
+        }
 
         // Alias all the CloudFormation tasks we want to enable
 

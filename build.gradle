@@ -23,13 +23,6 @@ plugins {
 group = 'com.cfnstacks.gradle'
 description = 'ArtifactS3 Gradle plugin'
 
-// Library Versions
-ext {
-    amazonSdkVersion = '1.11.172'
-    junitVersion = '4.12'
-    asciidoctorjVersion = '1.5.6'
-}
-
 asciidoctor {
     backends 'html5', 'pdf'
     attributes \
@@ -51,18 +44,18 @@ asciidoctor {
 }
 
 asciidoctorj {
-    version = asciidoctorjVersion
+    version = '1.5.6'
 }
 
 dependencies {
     compile gradleApi()
-    compile "com.amazonaws:aws-java-sdk:$amazonSdkVersion"
+    compile 'com.amazonaws:aws-java-sdk:1.11.179'
     compile 'jp.classmethod.aws:gradle-aws-plugin:0.35'
     compile 'net.researchgate:gradle-release:2.6.0'
     compile 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.3'
     compile 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.15'
     testCompile gradleTestKit()
-    testCompile "junit:junit:$junitVersion"
+    testCompile 'junit:junit:4.12'
 }
 
 pluginBundle {

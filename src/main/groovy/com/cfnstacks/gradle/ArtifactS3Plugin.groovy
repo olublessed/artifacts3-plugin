@@ -24,7 +24,6 @@ class ArtifactS3Plugin implements Plugin<Project> {
     static final String TASK_BUILD_NAME = 'pluginBuild'
     static final String TASK_CLEAN_NAME = 'pluginClean'
     static final String TASK_COPY_NAME = 'copyAndFilter'
-
     static final String TASK_DOCS = 'docs'
     static final String TASK_PROJECT_VERSION = 'projectVersion'
     static final String TASK_CREATE_STACK = 'createStack'
@@ -44,6 +43,7 @@ class ArtifactS3Plugin implements Plugin<Project> {
         project.plugins.apply(AmazonCloudFormationPlugin)
         project.plugins.apply(ReleasePlugin)
         project.plugins.apply(BasePlugin)
+
         project.extensions.create(PLUGIN_NAME, ArtifactS3PluginExtension)
 
         // Internal tasks
@@ -138,7 +138,7 @@ class ArtifactS3Plugin implements Plugin<Project> {
         // Configuration
 
         project.asciidoctorj {
-            version = '1.5.5'
+            version = '1.5.6'
         }
         project.publishing {
             publications {

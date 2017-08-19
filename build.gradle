@@ -27,7 +27,7 @@ description = 'ArtifactS3 Gradle plugin'
 ext {
     amazonSdkVersion = '1.11.172'
     junitVersion = '4.12'
-    asciidoctorjVersion = '1.5.5'
+    asciidoctorjVersion = '1.5.6'
 }
 
 asciidoctor {
@@ -59,6 +59,8 @@ dependencies {
     compile "com.amazonaws:aws-java-sdk:$amazonSdkVersion"
     compile 'jp.classmethod.aws:gradle-aws-plugin:0.35'
     compile 'net.researchgate:gradle-release:2.6.0'
+    compile 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.3'
+    compile 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.15'
     testCompile gradleTestKit()
     testCompile "junit:junit:$junitVersion"
 }

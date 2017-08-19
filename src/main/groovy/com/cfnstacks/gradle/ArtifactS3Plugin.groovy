@@ -3,6 +3,7 @@ package com.cfnstacks.gradle
 import com.amazonaws.auth.profile.ProfileCredentialsProvider
 import jp.classmethod.aws.gradle.cloudformation.AmazonCloudFormationPlugin
 import net.researchgate.release.ReleasePlugin
+import org.asciidoctor.gradle.AsciidoctorPlugin
 import org.apache.tools.ant.filters.ReplaceTokens
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -24,6 +25,7 @@ class ArtifactS3Plugin implements Plugin<Project> {
     static final String TASK_CLEAN_NAME = 'pluginClean'
     static final String TASK_COPY_NAME = 'copyAndFilter'
 
+    static final String TASK_DOCS = 'docs'
     static final String TASK_PROJECT_VERSION = 'projectVersion'
     static final String TASK_CREATE_STACK = 'createStack'
     static final String TASK_UPDATE_STACK = 'updateStack'
@@ -37,6 +39,7 @@ class ArtifactS3Plugin implements Plugin<Project> {
     @Override
     void apply(Project project) {
 
+        project.plugins.apply(AsciidoctorPlugin)
         project.plugins.apply(MavenPublishPlugin)
         project.plugins.apply(AmazonCloudFormationPlugin)
         project.plugins.apply(ReleasePlugin)
@@ -72,15 +75,18 @@ class ArtifactS3Plugin implements Plugin<Project> {
 
         // Externally facing tasks
 
-        def config = project.extensions.artifacts3
-
-        //task projectVersion() { doLast { println project.version } }
-
         project.task(TASK_PROJECT_VERSION) {
             group = GROUP_NAME
             description = 'Prints the version of the project'
             doLast { println project.version }
         }
+
+        project.task(TASK_DOCS, dependsOn: ['asciidoctor']) {
+            group = GROUP_NAME
+            description = 'Run AsciiDoctor to generate documentation'
+        }
+
+        def config = project.extensions.artifacts3
 
         // Alias all the CloudFormation tasks we want to enable
 
@@ -131,6 +137,9 @@ class ArtifactS3Plugin implements Plugin<Project> {
 
         // Configuration
 
+        project.asciidoctorj {
+            version = '1.5.5'
+        }
         project.publishing {
             publications {
                 CloudFormationArtifact(MavenPublication) {

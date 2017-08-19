@@ -84,45 +84,45 @@ class ArtifactS3Plugin implements Plugin<Project> {
 
         // Alias all the CloudFormation tasks we want to enable
 
-        Task createStackTask = project.task(TASK_CREATE_STACK, dependsOn: [buildTask, 'awsCfnMigrateStack']) {
+        Task createStackTask = project.task(TASK_CREATE_STACK, dependsOn: [copyAndFilter, 'awsCfnMigrateStack']) {
             group = GROUP_NAME
             description = 'Creates the stack and returns immediately'
         }
-        createStackTask.mustRunAfter(buildTask)
+        createStackTask.mustRunAfter(copyAndFilter)
 
-        Task updateStackTask = project.task(TASK_UPDATE_STACK, dependsOn: [buildTask, 'awsCfnMigrateStack']) {
+        Task updateStackTask = project.task(TASK_UPDATE_STACK, dependsOn: [copyAndFilter, 'awsCfnMigrateStack']) {
             group = GROUP_NAME
             description = 'Updates the stack and returns immediately'
         }
-        updateStackTask.mustRunAfter(buildTask)
+        updateStackTask.mustRunAfter(copyAndFilter)
 
         project.task(TASK_DELETE_STACK, dependsOn: ['awsCfnDeleteStack']) {
             group = GROUP_NAME
             description = 'Deletes the stack and returns immediately'
         }
 
-        Task createStackAndWaitTask = project.task(TASK_CREATE_STACK_AND_WAIT, dependsOn: [buildTask, 'awsCfnMigrateStackAndWaitCompleted']) {
+        Task createStackAndWaitTask = project.task(TASK_CREATE_STACK_AND_WAIT, dependsOn: [copyAndFilter, 'awsCfnMigrateStackAndWaitCompleted']) {
             group = GROUP_NAME
             description = 'Creates the stack and returns when completed'
         }
-        createStackAndWaitTask.mustRunAfter(buildTask)
+        createStackAndWaitTask.mustRunAfter(copyAndFilter)
 
-        Task updateStackAndWait = project.task(TASK_UPDATE_STACK_AND_WAIT, dependsOn: [buildTask, 'awsCfnMigrateStackAndWaitCompleted']) {
+        Task updateStackAndWait = project.task(TASK_UPDATE_STACK_AND_WAIT, dependsOn: [copyAndFilter, 'awsCfnMigrateStackAndWaitCompleted']) {
             group = GROUP_NAME
             description = 'Updates the stack and returns when completed'
         }
-        updateStackAndWait.mustRunAfter(buildTask)
+        updateStackAndWait.mustRunAfter(copyAndFilter)
 
         project.task(TASK_DELETE_STACK_AND_WAIT, dependsOn: ['awsCfnDeleteStackAndWaitCompleted']) {
             group = GROUP_NAME
             description = 'Deletes the stack and returns when completed'
         }
 
-        Task createChangeSetTask = project.task(TASK_CREATE_CHANGE_SET, dependsOn: [buildTask, 'awsCfnCreateChangeSet']) {
+        Task createChangeSetTask = project.task(TASK_CREATE_CHANGE_SET, dependsOn: [copyAndFilter, 'awsCfnCreateChangeSet']) {
             group = GROUP_NAME
             description = 'Creates a change set'
         }
-        createChangeSetTask.mustRunAfter(buildTask)
+        createChangeSetTask.mustRunAfter(copyAndFilter)
 
         project.task(TASK_EXECUTE_CHANGE_SET, dependsOn: ['awsCfnExecuteChangeSet']) {
             group = GROUP_NAME

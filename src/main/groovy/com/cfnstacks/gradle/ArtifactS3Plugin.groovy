@@ -15,6 +15,7 @@ import org.gradle.api.publish.maven.plugins.MavenPublishPlugin
 import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.bundling.Jar
+import org.kordamp.gradle.livereload.LiveReloadPlugin
 
 class ArtifactS3Plugin implements Plugin<Project> {
 
@@ -38,11 +39,12 @@ class ArtifactS3Plugin implements Plugin<Project> {
     @Override
     void apply(Project project) {
 
-        project.plugins.apply(AsciidoctorPlugin)
-        project.plugins.apply(MavenPublishPlugin)
         project.plugins.apply(AmazonCloudFormationPlugin)
-        project.plugins.apply(ReleasePlugin)
+        project.plugins.apply(AsciidoctorPlugin)
         project.plugins.apply(BasePlugin)
+        project.plugins.apply(LiveReloadPlugin)
+        project.plugins.apply(MavenPublishPlugin)
+        project.plugins.apply(ReleasePlugin)
 
         project.extensions.create(PLUGIN_NAME, ArtifactS3PluginExtension)
 
@@ -139,6 +141,9 @@ class ArtifactS3Plugin implements Plugin<Project> {
 
         project.asciidoctorj {
             version = '1.5.6'
+        }
+        project.liveReload {
+            docRoot 'build/asciidoc/html5'
         }
         project.publishing {
             publications {

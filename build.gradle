@@ -18,7 +18,10 @@ plugins {
     id 'net.researchgate.release' version '2.6.0'
     id 'org.asciidoctor.convert' version '1.5.3'
     id 'org.ajoberstar.grgit' version '2.0.0'
+    id 'org.kordamp.gradle.livereload' version '0.2.1'
 }
+
+apply plugin: 'org.kordamp.gradle.livereload'
 
 group = 'com.cfnstacks.gradle'
 description = 'ArtifactS3 Gradle plugin'
@@ -54,8 +57,13 @@ dependencies {
     compile 'net.researchgate:gradle-release:2.6.0'
     compile 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.3'
     compile 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.15'
+    compile 'org.kordamp.gradle:livereload-gradle-plugin:0.2.1'
     testCompile gradleTestKit()
     testCompile 'junit:junit:4.12'
+}
+
+liveReload {
+    docRoot 'build/asciidoc/html5'
 }
 
 pluginBundle {

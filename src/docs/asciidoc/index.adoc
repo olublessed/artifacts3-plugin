@@ -222,13 +222,13 @@ To make the changes described in a change set to your stack, execute the change 
 
 The project uses the Gradle build tool and is configured to use the Gradle Wrapper utility. This means that Java is
 the only dependency of the project. To build and install the plugin locally run the command `./gradlew install`
-or `./gradlew.bat install` if running from a Windows machine.
+or `gradlew.bat install` if running from a Windows machine.
 
 == Documentation Links
 
 ifdef::backend-html5[]
 === icon:file-code-o[] https://cfn-stacks.com/docs/index.html[Web^]
-=== icon:file-pdf-o[] pass:[<a href="./artifacts3-plugin.pdf" target="_blank">PDF Version</a>]
+=== icon:file-pdf-o[] pass:[<a href="./artifacts3-plugin.pdf" target="_blank">PDF</a>]
 === icon:git[] https://github.com/cfn-stacks/artifacts3-plugin[Source^]
 endif::backend-html5[]
 ifdef::backend-pdf[]

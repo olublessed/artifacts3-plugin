@@ -1,16 +1,215 @@
 = ArtifactS3 Plugin
 v{projectVersion}
-ifdef::backend-pdf[]
-:title-logo-image: image:logo.png[500, 500, align="center"]
-endif::backend-pdf[]
-
-ifdef::backend-html5[]
-image::logo.png[Logo, 150, 150, float="left"] +
-endif::backend-html5[]
 
 == Overview
 
-A Gradle plugin to automate publishing to an ArtifactS3 repository.
+A Gradle plugin that provides workflow capabilities for CloudFormation script authoring and publishing. The capabilities
+enabled by this plugin are created through the integration of a number of existing plugins to support the process shown
+below.
+
+.CloudFormation Stacks Process
+****
+[.text-center]
+Create icon:arrow-right[role="green"] Document icon:arrow-right[role="green"] Publish icon:arrow-right[role="green"]
+Version icon:arrow-right[role="green"] Deploy icon:arrow-right[role="green"] Update icon:refresh[role="green"]
+
+* _Create:_  The https://docs.gradle.org/current/userguide/standard_plugins.html#sec:base_plugins[Gradle Base Plugin]
+    and an internal copy and filter task provide a basic template value replacement which is used to add the artifact id
+    and version pulled from the build.gradle file and the packaging of templates into jar files. These values are
+    exposes as stack outputs in all of the example templates for easy inspection of version information on a
+    running stack.
+* _Document:_ The https://github.com/asciidoctor/asciidoctor-gradle-plugin[AsciiDoctor Gradle Plugin] provides the
+    ability to turn AsciiDoc markup into HTML and PDF documents. The https://github.com/aalmiray/livereload-gradle-plugin[LiveReload Gradle Plugin]
+    along with a http://livereload.com/extensions/[browser extension] will continuously rebuild the docs as you type.
+* _Publish:_ The https://github.com/researchgate/gradle-release[Gradle Release Plugin] automates the SCM tagging process
+    to create a final release before publishing The https://docs.gradle.org/current/userguide/publishing_maven.html[Maven Publishing Plugin]
+    provides the ability to generate the metadata files needed for a Maven repository and the abilty to publish to an
+    ArtifactS3 repo.
+* _Version:_ During development a https://maven.apache.org/glossary.html[SNAPSHOT version] can be published but prior
+    to using the stack in another project you'll publish a versioned release. This allows users of the template to
+    use a stable version while new versions are being developed.
+* _Deploy:_ The https://github.com/classmethod/gradle-aws-plugin[Gradle AWS Plugin] automates the interaction with
+    CloudFormation so they can be easily run from the command line.
+* _Update:_ CloudFormation offers both on-demand updates and the ability to perform a "dry-run" though the use of a
+    change set which describes the actions that will be taken if executed to avoid any update surprises.
+****
+
+== Workflow
+
+To support the process there is a recommended workflow.
+
+=== Create Project
+
+. Create a copy of the https://github.com/cfn-stacks/app-example[example project]
+. Update the project name in settings.gradle and the description in build.gradle
+. Create a local-config.groovy file to hold local settings
+. Remove the .git directory and then run `git init` again to reset the repo with your project content
+
+=== Create Templates
+
+. Decompose your solution into components and either reuse existing functionality or write new components
+    with the intention of creating reusable content were possible. The CloudFormation documentation has some
+    http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/best-practices.html[best practices] documented.
+. If your solution contains resources that are deployed within a http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_Introduction.html[VPC]
+    the AWS architects established a pattern of creating an app template that accepts VPC or subnet parameters
+    to deploy within an existing VPC and then a second template, usually called *-main.yaml that creates a VPC
+    and deploys the application as a substack.
+
+=== Document
+
+. The project has already been configured with a doc template in src/docs/asciidoc/index.adoc which should be
+    used to document as you develop by running the command `./gradlew docs` after adding content.
+. To use the live reload feature there's a couple of steps:
+    * Install a http://livereload.com/extensions/[browser extension]
+    * In one console window run gradle with the -t continuous build option `./gradlew -t docs`
+    * In another console window run the live reload server process `./gradlew liveReload`
+    * Open the  build/asciidoc/html5/index.html file in a web browser with the livereload plugin activated and
+        shortly after you make a change and save the source files the browser will update.
+
+=== Publish
+
+. Before publishing you'll need to http://docs.aws.amazon.com/cli/latest/userguide/installing.html[Install the AWS CLI]
+    and http://docs.aws.amazon.com/cli/latest/userguide/cli-multiple-profiles.html[configure a named profile] with
+    access to your ArtifactS3 repo bucket. This profile name will be supplied either in your local-config.groovy
+    file (example below) or as a command line argument. `./gradlew updateStack -Pprofile=my-aws-cli-profile-name -Pstack=test-repo`
+. If there is only one template in the main/cloudformation directory you can test during development by
+    delploying the snapshot directly. The plugin will handle uploading a single script to a temp bucket before
+    running in CloudFormation but if several scripts are present that reference each other such as the
+    app.yaml and app-main.yaml pattern you must publish first before deploying. To publish
+
+.local-config.groovy example
+[source,groovy]
+project.params.with {
+    profile = 'my-aws-cli-profile-name'
+    stack = 'test-repo'
+}
+
+=== Version
+
+. While in development you can skip this step and deploy/update until you're satified with the state of your
+    component. Prior to using in another project create a release version using the command `./gradlew release`.
+    This will ask two questions (release version and next snapshot version) which you'll probably just accept the
+    defaults and then it will tag, publish and advance to the next snapshot version for future development.
+
+=== Deploy
+
+To deploy a stack use the create or update stack commands. `./gradlew updateStack`.
+
+=== Version
+
+
+
+=== Update
+
+To update a stack you can either run the updateStack command to immediately execute the changes or you can run
+the createChangeSet task first at which point you can http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-changesets-view.html[inspect the changes]
+that will occur in a future update but without actually applying the update in the first step. If you're happy
+with the change set you can then execute to apply the update.
+
+== Project Structure
+
+The https://github.com/cfn-stacks/app-example[cfn-stacks example] project explains all of the project files in
+more detail but for purposes of illustration of plugin functionality the project file structure is shown below.
+
+[source]
+├── LICENSE
+├── build
+│   └── cloudformation
+│       ├── app-main.yaml
+│       └── app.yaml
+├── build.gradle
+├── gradle/
+├── gradlew
+├── gradlew.bat
+├── local-config.groovy
+├── settings.gradle
+└── src/
+    ├── docs/
+    │   └── asciidoc
+    │       ├── index.adoc
+    │       └── stylesheets
+    │           └── style.css
+    └── main/
+        └── cloudformation
+            ├── app-main.yaml
+            └── app.yaml
+
+== Plugin Tasks
+
+=== build
+
+The build task will compare the files in the build/ and src/ directories and rebuild if the /src files have
+been updated since the last run. For CloudFormation template projects a build consists of running the copy and
+filter task which replaces tokens found in the templates in the src/ directory with values from the project.
+
+=== clean
+
+The clean task will remove the build/ directory and all its contents. As Gradle is good about detecting if a
+build needs to occur based on file contents you don't need to run the clean command in between builds.
+
+=== docs
+
+Generate the HTML and PDF documentation to build/asciidoc/[html5|pdf] from Asciidoctor markup in src/docs/asciidoc
+
+=== projectVersion
+
+Prints the version of the project as found in the gradle.properties file. Useful for scripted tasks like
+the https://github.com/cfn-stacks/artifacts3-plugin/blob/v0.1.5/publish-docs.sh[publishing of documentation]
+when the version captured as part of the URL.
+
+=== publish
+
+Runs the build task and then zips up the resulting templates into a *.cfn.jar file which is then pushed to an
+ArtifactS3 repo (S3 bucket).
+
+=== release
+
+Wraps the https://github.com/researchgate/gradle-release[Gradle Release Plugin] to perform the following steps:
+
+* Checks for any un-committed files (Added, modified, removed, or un-versioned).
+* Checks for any incoming or outgoing changes.
+* Removes the SNAPSHOT flag on your project's version (If used)
+* Prompts you for the release version.
+* Checks if your project is using any SNAPSHOT dependencies
+* Builds the project.
+* Commits the project if SNAPSHOT was being used.
+* Creates a release tag with the current version.
+* Prompts you for the next version.
+* Commits the project with the new version.
+
+By default the plugin will prompt for version information but the information can be sent in via parameters
+for automation/CI usage. The release task will automatically run the publish task.
+
+=== createStack
+
+An alias for updateStack. There is also a createStackAndWWait task that will not return until the operation
+has completed.
+
+=== updateStack
+
+Collect the set of parameters specified in the available config files and command line params and either launches
+a new CloudFormation stack or updates an existing stack. There is also a updateStackAndWWait task that will not
+return until the operation has completed.
+
+=== deleteStack
+
+Deletes an existing CloudFormation stack. There is also a deleteStackAndWWait task that will not return until
+the operation has completed.
+
+=== createChangeSet
+
+From the http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-changesets.html[CloudFormation docs on Change Sets]:
+
+When you need to update a stack, understanding how your changes will affect running resources before you
+implement them can help you update stacks with confidence. Change sets allow you to preview how proposed changes
+to a stack might impact your running resources, for example, whether your changes will delete or replace any
+critical resources, AWS CloudFormation makes the changes to your stack only when you decide to execute the
+change set, allowing you to decide whether to proceed with your proposed changes or explore other changes by
+creating another change set.
+
+=== executeChangeSet
+
+To make the changes described in a change set to your stack, execute the change set
 
 == Building
 
@@ -19,15 +218,21 @@ A Gradle plugin to automate publishing to an ArtifactS3 repository.
 * http://www.oracle.com/technetwork/pt/java/javase/downloads/index.html[Java 8 JDK^]: Download from Oracle or
     use a packaged version for your OS
 
-=== Documentation Links
+=== Build
+
+The project uses the Gradle build tool and is configured to use the Gradle Wrapper utility. This means that Java is
+the only dependency of the project. To build and install the plugin locally run the command `./gradlew install`
+or `./gradlew.bat install` if running from a Windows machine.
+
+== Documentation Links
 
 ifdef::backend-html5[]
-=== icon:file-code-o[] https://cfn-stacks.com/docs/latest[Web^]
+=== icon:file-code-o[] https://cfn-stacks.com/docs/index.html[Web^]
 === icon:file-pdf-o[] pass:[<a href="./artifacts3-plugin.pdf" target="_blank">PDF Version</a>]
 === icon:git[] https://github.com/cfn-stacks/artifacts3-plugin[Source^]
 endif::backend-html5[]
 ifdef::backend-pdf[]
-=== https://cfn-stacks.com/docs/latest[Web^]
+=== https://cfn-stacks.com/docs/index.html[Web^]
 === https://github.com/cfn-stacks/artifacts3-plugin[Source^]
 endif::backend-pdf[]
 

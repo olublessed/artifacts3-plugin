@@ -95,10 +95,6 @@ project.params.with {
 
 To deploy a stack use the create or update stack commands. `./gradlew updateStack`.
 
-=== Version
-
-
-
 === Update
 
 To update a stack you can either run the updateStack command to immediately execute the changes or you can run

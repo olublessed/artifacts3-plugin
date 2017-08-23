@@ -56,7 +56,7 @@ class ArtifactS3Plugin implements Plugin<Project> {
 
             // When templates need to refer to other templates within the same artifact they
             // can use the @templatePath@ token which will compute the path
-            String path = "${(project.version.contains('SNAPSHOT')) ? 'snapshot' : 'release'}/${params.group.replace('.', '/')}/${project.version}"
+            String path = "${(project.version.contains('SNAPSHOT')) ? 'snapshot' : 'release'}/${project.group.replace('.', '/')}/${project.version}"
 
             filter(ReplaceTokens, tokens: [
                     artifactId: project.name,

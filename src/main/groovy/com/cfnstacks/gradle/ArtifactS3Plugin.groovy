@@ -54,9 +54,14 @@ class ArtifactS3Plugin implements Plugin<Project> {
             from 'src/main/cloudformation'
             into 'build/cloudformation'
 
+            // When templates need to refer to other templates within the same artifact they
+            // can use the @templatePath@ token which will compute the path
+            String path = "${(project.version.contains('SNAPSHOT')) ? 'snapshot' : 'release'}/${params.group.replace('.', '/')}/${project.version}"
+
             filter(ReplaceTokens, tokens: [
-                artifactId: project.name,
-                version: project.version
+                    artifactId: project.name,
+                    version: project.version,
+                    templatePath: path
             ])
         }
 

@@ -55,7 +55,8 @@ class ArtifactS3Plugin implements Plugin<Project> {
             into 'build/cloudformation'
 
             doFirst { // Force evaluation of project.group
-                String artifactPath = "${(project.version.contains('SNAPSHOT')) ? 'snapshot' : 'release'}/${project.group.replace('.', '/')}/${project.version}"
+                String artifactPath = "${(project.version.contains('SNAPSHOT')) ? 'snapshot' : 'release'}" +
+                                    "/${project.group.replace('.', '/')}/${project.version}/${project.name}"
 
                 // When templates need to refer to other templates within the same artifact they
                 // can use the @templatePath@ token which will compute the path

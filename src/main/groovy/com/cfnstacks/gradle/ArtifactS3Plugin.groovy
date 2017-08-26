@@ -1,5 +1,7 @@
 package com.cfnstacks.gradle
 
+import static groovy.json.JsonOutput.*
+
 import com.amazonaws.auth.profile.ProfileCredentialsProvider
 import jp.classmethod.aws.gradle.cloudformation.AmazonCloudFormationPlugin
 import net.researchgate.release.ReleasePlugin
@@ -26,6 +28,7 @@ class ArtifactS3Plugin implements Plugin<Project> {
     static final String TASK_CLEAN_NAME = 'pluginClean'
     static final String TASK_COPY_NAME = 'copyAndFilter'
     static final String TASK_DOCS = 'docs'
+    static final String TASK_PROJECT_PARAMS = 'projectParams'
     static final String TASK_PROJECT_VERSION = 'projectVersion'
     static final String TASK_CREATE_STACK = 'createStack'
     static final String TASK_UPDATE_STACK = 'updateStack'
@@ -89,6 +92,14 @@ class ArtifactS3Plugin implements Plugin<Project> {
             group = GROUP_NAME
             description = 'Prints the version of the project'
             doLast { println project.version }
+        }
+
+        project.task(TASK_PROJECT_PARAMS) {
+            doLast {
+                group = GROUP_NAME
+                description = 'Prints the paramaters and values that will be used to update the stack'
+                println prettyPrint(toJson(project.ext.stackParameters[project.ext.params.stackParamSet]))
+            }
         }
 
         project.task(TASK_DOCS, dependsOn: ['asciidoctor']) {

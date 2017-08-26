@@ -147,6 +147,11 @@ build needs to occur based on file contents you don't need to run the clean comm
 
 Generate the HTML and PDF documentation to build/asciidoc/[html5|pdf] from Asciidoctor markup in src/docs/asciidoc
 
+=== projectParams
+
+Prints the parameter names and values that will be passed into the stack template. This task can be useful to
+check the state of overrides when setting up build.gradle, local-config.groovy and CLI properties.
+
 === projectVersion
 
 Prints the version of the project as found in the gradle.properties file. Useful for scripted tasks like

@@ -1,12 +1,10 @@
 package com.cfnstacks.gradle
 
-import static groovy.json.JsonOutput.*
-
 import com.amazonaws.auth.profile.ProfileCredentialsProvider
 import jp.classmethod.aws.gradle.cloudformation.AmazonCloudFormationPlugin
 import net.researchgate.release.ReleasePlugin
-import org.asciidoctor.gradle.AsciidoctorPlugin
 import org.apache.tools.ant.filters.ReplaceTokens
+import org.asciidoctor.gradle.AsciidoctorPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -18,6 +16,9 @@ import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.bundling.Jar
 import org.kordamp.gradle.livereload.LiveReloadPlugin
+
+import static groovy.json.JsonOutput.prettyPrint
+import static groovy.json.JsonOutput.toJson
 
 class ArtifactS3Plugin implements Plugin<Project> {
 

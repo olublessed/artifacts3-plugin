@@ -52,11 +52,11 @@ asciidoctorj {
 
 dependencies {
     compile gradleApi()
-    compile 'com.amazonaws:aws-java-sdk:1.11.179'
+    compile 'com.amazonaws:aws-java-sdk:1.11.210'
     compile 'jp.classmethod.aws:gradle-aws-plugin:0.35'
     compile 'net.researchgate:gradle-release:2.6.0'
-    compile 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.3'
-    compile 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.15'
+    compile 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.6'
+    compile 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.16'
     compile 'org.kordamp.gradle:livereload-gradle-plugin:0.2.1'
     testCompile gradleTestKit()
     testCompile 'junit:junit:4.12'

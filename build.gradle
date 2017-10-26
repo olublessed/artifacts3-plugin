@@ -13,11 +13,11 @@ plugins {
     id 'java'
     id 'maven'
     id 'maven-publish'
-    id 'com.gradle.plugin-publish' version '0.9.7'
+    id 'com.gradle.plugin-publish' version '0.9.9'
     id 'jp.classmethod.aws.cloudformation' version '0.35'
     id 'net.researchgate.release' version '2.6.0'
-    id 'org.asciidoctor.convert' version '1.5.3'
-    id 'org.ajoberstar.grgit' version '2.0.0'
+    id 'org.asciidoctor.convert' version '1.5.6'
+    id 'org.ajoberstar.grgit' version '2.1.0'
     id 'org.kordamp.gradle.livereload' version '0.2.1'
 }
 
@@ -52,7 +52,7 @@ asciidoctorj {
 
 dependencies {
     compile gradleApi()
-    compile 'com.amazonaws:aws-java-sdk:1.11.210'
+    compile 'com.amazonaws:aws-java-sdk:1.11.220'
     compile 'jp.classmethod.aws:gradle-aws-plugin:0.35'
     compile 'net.researchgate:gradle-release:2.6.0'
     compile 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.6'

@@ -1,10 +1,10 @@
 buildscript {
     repositories { maven { url "https://plugins.gradle.org/m2/" } }
     dependencies {
-        classpath 'com.gradle.publish:plugin-publish-plugin:0.9.7'
-        classpath 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.15'
+        classpath 'com.gradle.publish:plugin-publish-plugin:0.9.9'
+        classpath 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.16'
         classpath 'net.researchgate:gradle-release:2.6.0'
-        classpath 'jp.classmethod.aws:gradle-aws-plugin:0.35'
+        classpath 'jp.classmethod.aws:gradle-aws-plugin:0.36'
     }
 }
 
@@ -14,7 +14,7 @@ plugins {
     id 'maven'
     id 'maven-publish'
     id 'com.gradle.plugin-publish' version '0.9.9'
-    id 'jp.classmethod.aws.cloudformation' version '0.35'
+    id 'jp.classmethod.aws.cloudformation' version '0.36'
     id 'net.researchgate.release' version '2.6.0'
     id 'org.asciidoctor.convert' version '1.5.6'
     id 'org.ajoberstar.grgit' version '2.1.0'
@@ -52,8 +52,8 @@ asciidoctorj {
 
 dependencies {
     compile gradleApi()
-    compile 'com.amazonaws:aws-java-sdk:1.11.220'
-    compile 'jp.classmethod.aws:gradle-aws-plugin:0.35'
+    compile 'com.amazonaws:aws-java-sdk:1.11.226'
+    compile 'jp.classmethod.aws:gradle-aws-plugin:0.36'
     compile 'net.researchgate:gradle-release:2.6.0'
     compile 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.6'
     compile 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.16'

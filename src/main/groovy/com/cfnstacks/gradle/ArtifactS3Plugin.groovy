@@ -195,6 +195,7 @@ class ArtifactS3Plugin implements Plugin<Project> {
         Task publishTask = project.tasks.getByName('publish')
         project.tasks.getByName('afterReleaseBuild').dependsOn(publishTask)
         publishTask.dependsOn(buildTask)
+        publishTask.mustRunAfter(buildTask)
 
         project.afterEvaluate { project.extensions.getByType(ArtifactS3PluginExtension).settings(project) }
     }

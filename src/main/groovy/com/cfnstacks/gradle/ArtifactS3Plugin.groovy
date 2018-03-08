@@ -195,7 +195,6 @@ class ArtifactS3Plugin implements Plugin<Project> {
         Task cleanTask = project.tasks.getByName('clean')
         Task publishTask = project.tasks.getByName('publish')
         project.tasks.getByName('afterReleaseBuild').dependsOn(publishTask)
-        publishTask.dependsOn(cleanTask)
         publishTask.dependsOn(buildTask)
         publishTask.mustRunAfter([cleanTask, buildTask])
 

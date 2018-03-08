@@ -192,15 +192,12 @@ class ArtifactS3Plugin implements Plugin<Project> {
         }
         project.release { tagTemplate = 'v${version}' }
 
+        Task cleanTask = project.tasks.getByName('clean')
         Task publishTask = project.tasks.getByName('publish')
         project.tasks.getByName('afterReleaseBuild').dependsOn(publishTask)
-        publishTask.dependsOn(buildTask)
-        publishTask.mustRunAfter(buildTask)
-
-        Task cleanTask = project.tasks.getByName('clean')
         publishTask.dependsOn(cleanTask)
-        publishTask.mustRunAfter(cleanTask)
-
+        publishTask.dependsOn(buildTask)
+        publishTask.mustRunAfter([cleanTask, buildTask])
 
         project.afterEvaluate { project.extensions.getByType(ArtifactS3PluginExtension).settings(project) }
     }

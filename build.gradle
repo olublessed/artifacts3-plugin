@@ -52,7 +52,7 @@ asciidoctorj {
 
 dependencies {
     compile gradleApi()
-    compile 'com.amazonaws:aws-java-sdk:1.11.290'
+    compile 'com.amazonaws:aws-java-sdk:1.11.292'
     compile 'jp.classmethod.aws:gradle-aws-plugin:0.35'
     compile 'net.researchgate:gradle-release:2.6.0'
     compile 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.6'

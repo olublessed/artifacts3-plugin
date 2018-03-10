@@ -55,6 +55,8 @@ class ArtifactS3Plugin implements Plugin<Project> {
         // Internal tasks
 
         Task copyAndFilter = project.task(TASK_COPY_NAME, type: Sync) {
+            outputs.upToDateWhen { false }
+
             from 'src/main/cloudformation'
             into 'build/cloudformation'
 

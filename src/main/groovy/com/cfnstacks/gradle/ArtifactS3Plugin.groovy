@@ -98,11 +98,9 @@ class ArtifactS3Plugin implements Plugin<Project> {
         }
 
         project.task(TASK_PROJECT_PARAMS) {
-            doLast {
-                group = GROUP_NAME
-                description = 'Prints the paramaters and values that will be used to update the stack'
-                println prettyPrint(toJson(project.ext.stackParameters[project.ext.params.stackParamSet]))
-            }
+            group = GROUP_NAME
+            description = 'Prints the paramaters and values that will be used to update the stack'
+            doLast { println prettyPrint(toJson(project.ext.stackParameters[project.ext.params.stackParamSet])) }
         }
 
         project.task(TASK_DOCS, dependsOn: ['asciidoctor']) {
